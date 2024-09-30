@@ -1,0 +1,48 @@
+/* src/components/Calendar.css */
+.calendar-container {
+    margin-bottom: 40px;
+  }
+  
+  .calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-table th, .calendar-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .calendar-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .marker {
+    cursor: pointer;
+    font-size: 1.5em;
+  }
+  
+  .success {
+    color: green;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .weekly-improvements ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .weekly-improvements li {
+    margin-bottom: 5px;
+  }
+  
+  .current-day {
+    margin-top: 20px;
+    font-size: 1.2em;
+  }
+  

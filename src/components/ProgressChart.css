@@ -1,0 +1,25 @@
+/* src/components/ProgressChart.css */
+.progress-chart-container {
+    margin-bottom: 40px;
+  }
+  
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .virtue-selector, .week-selector {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .virtue-selector label, .week-selector label {
+    margin-bottom: 5px;
+  }
+  
+  .week-selector input {
+    width: 60px;
+    margin-bottom: 10px;
+  }
+  
