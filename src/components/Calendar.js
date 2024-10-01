@@ -1,12 +1,7 @@
 // src/components/Calendar.js
-
 import React, { useState, useEffect } from 'react';
 import { virtues as allVirtues } from '../utils/virtues';
-import { 
-  getVirtuesWithRecords, 
-  createVirtueRecordAPI, 
-  updateVirtueRecordAPI 
-} from '../api';
+import { getVirtuesWithRecords, createVirtueRecordAPI, updateVirtueRecordAPI } from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './Calendar.css';
 
@@ -16,20 +11,10 @@ const Calendar = () => {
   const [currentWeekVirtue, setCurrentWeekVirtue] = useState(null);
   const [records, setRecords] = useState({});
   const [showDescription, setShowDescription] = useState({});
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        initializeVirtue();
-        await loadRecords();
-        await calculateWeeklyImprovement();
-      } catch (err) {
-        console.error(err);
-        setError('Hubo un problema al cargar los registros. Por favor, intenta nuevamente.');
-      }
-    };
-    initialize();
+    initializeVirtue();
+    loadRecords();
   }, []);
 
   const initializeVirtue = () => {
@@ -41,44 +26,47 @@ const Calendar = () => {
 
   const loadRecords = async () => {
     const today = new Date();
-    const startOfWeekDate = getStartOfWeek(today);
-    const startDate = startOfWeekDate.toISOString().split('T')[0];
-    const endDateObj = new Date(startOfWeekDate);
-    endDateObj.setDate(endDateObj.getDate() + 6);
-    const endDate = endDateObj.toISOString().split('T')[0];
+    const startOfWeek = getStartOfWeek(today);
+    const startDate = new Date(startOfWeek);
+    const endDate = new Date(startOfWeek);
+    endDate.setDate(endDate.getDate() + 6);
 
-    const data = await getVirtuesWithRecords(startDate, endDate);
+    const data = await getVirtuesWithRecords(
+      startDate.toISOString().split('T')[0],
+      endDate.toISOString().split('T')[0]
+    );
 
     if (!data || data.length === 0) {
-      // Inicializar registros vacíos para la virtud de la semana actual
-      await initializeEmptyRecords(startOfWeekDate);
+      // Inicializar registros vacíos para cada virtud y día de la semana
+      for (const virtue of allVirtues) {
+        const weekNumber = getWeekNumber(startOfWeek);
+        const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
+
+        const newRecords = {};
+        daysOfWeek.forEach((day, index) => {
+          const recordDate = new Date(startOfWeek);
+          recordDate.setDate(startOfWeek.getDate() + index);
+          newRecords[day] = {
+            virtueID: virtue.id,
+            status: null,
+            date: recordDate.toISOString().split('T')[0],
+            weekNumber: weekNumber,
+            weekVirtueID: weekVirtueID,
+          };
+        });
+
+        for (const day in newRecords) {
+          await createVirtueRecordAPI(newRecords[day]);
+        }
+      }
       // Recargar los registros después de inicializar
-      const refreshedData = await getVirtuesWithRecords(startDate, endDate);
+      const refreshedData = await getVirtuesWithRecords(
+        startDate.toISOString().split('T')[0],
+        endDate.toISOString().split('T')[0]
+      );
       processRecords(refreshedData);
     } else {
       processRecords(data);
-    }
-  };
-
-  const initializeEmptyRecords = async (startOfWeek) => {
-    const weekNumber = getWeekNumber(startOfWeek);
-    const weekVirtue = allVirtues[(weekNumber - 1) % allVirtues.length];
-    const weekVirtueID = weekVirtue.id;
-
-    for (let index = 0; index < daysOfWeek.length; index++) {
-      const recordDate = new Date(startOfWeek);
-      recordDate.setDate(startOfWeek.getDate() + index);
-      const formattedDate = recordDate.toISOString().split('T')[0];
-
-      const newRecord = {
-        virtueID: weekVirtueID,
-        status: null,
-        date: formattedDate,
-        weekNumber: weekNumber,
-        weekVirtueID: weekVirtueID,
-      };
-
-      await createVirtueRecordAPI(newRecord);
     }
   };
 
@@ -131,101 +119,60 @@ const Calendar = () => {
     const weekNumber = getWeekNumber(startOfWeek);
     const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
 
-    try {
-      const filter = {
-        virtueID: { eq: virtueId },
-        date: { eq: formattedDate }
-      };
+    const existingRecords = await getVirtuesWithRecords(formattedDate, formattedDate);
+    const existingRecord = existingRecords.find(
+      (record) => record.virtueID === virtueId && record.date === formattedDate
+    );
 
-      const response = await getVirtuesWithRecords(formattedDate, formattedDate);
-      const existingRecord = response.find(
-        (record) => record.virtueID === virtueId && record.date === formattedDate
-      );
-
-      if (existingRecord) {
-        await updateVirtueRecordAPI({
-          id: existingRecord.id,
-          virtueID: virtueId,
-          status: newStatus,
-          date: formattedDate,
-          weekNumber: weekNumber,
-          weekVirtueID: weekVirtueID,
-        });
-      } else {
-        await createVirtueRecordAPI({
-          virtueID: virtueId,
-          status: newStatus,
-          date: formattedDate,
-          weekNumber: weekNumber,
-          weekVirtueID: weekVirtueID,
-        });
-      }
-    } catch (err) {
-      console.error('Error al actualizar o crear el registro:', err);
-      setError('Hubo un problema al actualizar el registro. Por favor, intenta nuevamente.');
+    if (existingRecord) {
+      await updateVirtueRecordAPI({
+        id: existingRecord.id,
+        virtueID: virtueId,
+        status: newStatus,
+        date: formattedDate,
+        weekNumber: weekNumber,
+        weekVirtueID: weekVirtueID,
+      });
+    } else {
+      await createVirtueRecordAPI({
+        virtueID: virtueId,
+        status: newStatus,
+        date: formattedDate,
+        weekNumber: weekNumber,
+        weekVirtueID: weekVirtueID,
+      });
     }
   };
 
-  const calculateSuccess = (virtueId, recordsData) => {
-    if (!recordsData[virtueId]) {
+  const calculateSuccess = (virtueId) => {
+    if (!records[virtueId]) {
       return 0;
     }
 
-    const weekDays = daysOfWeek.map(day => recordsData[virtueId][day]);
+    const weekDays = daysOfWeek.map(day => records[virtueId][day]);
     const successCount = weekDays.filter(status => status === true).length;
     return (successCount / 7) * 100;
   };
 
-  const calculateWeeklyImprovement = async () => {
-    try {
-      const today = new Date();
-      const currentWeekNumber = getWeekNumber(today);
-      const previousWeekStart = new Date(today);
-      previousWeekStart.setDate(previousWeekStart.getDate() - 7);
-      const previousWeekNumber = currentWeekNumber > 1 ? currentWeekNumber - 1 : 1;
+  const calculateWeeklyImprovement = () => {
+    const today = new Date();
+    const currentWeekNumber = getWeekNumber(today);
+    const previousWeekNumber = currentWeekNumber > 1 ? currentWeekNumber - 1 : 1;
 
-      const startDate = getStartOfWeek(previousWeekStart).toISOString().split('T')[0];
-      const endDateObj = new Date(getStartOfWeek(previousWeekStart));
-      endDateObj.setDate(endDateObj.getDate() + 6);
-      const endDate = endDateObj.toISOString().split('T')[0];
+    const improvements = allVirtues.map((virtue) => {
+      const currentWeekSuccess = calculateSuccess(virtue.id);
+      const previousWeekSuccess = 0; // Implementar lógica para obtener la semana anterior si es necesario
 
-      const previousData = await getVirtuesWithRecords(startDate, endDate);
+      return {
+        virtue: virtue.name,
+        improvement: currentWeekSuccess - previousWeekSuccess,
+      };
+    });
 
-      const previousRecords = {};
-      previousData.forEach((record) => {
-        if (!previousRecords[record.virtueID]) {
-          previousRecords[record.virtueID] = {};
-        }
-        const dayName = getDayName(new Date(record.date).getDay());
-        previousRecords[record.virtueID][dayName] = record.status;
-      });
-
-      const currentSuccess = {};
-      allVirtues.forEach(virtue => {
-        currentSuccess[virtue.id] = calculateSuccess(virtue.id, records);
-      });
-
-      const previousSuccess = {};
-      allVirtues.forEach(virtue => {
-        previousSuccess[virtue.id] = calculateSuccess(virtue.id, previousRecords);
-      });
-
-      const improvements = allVirtues.map((virtue) => {
-        const improvement = currentSuccess[virtue.id] - previousSuccess[virtue.id];
-        return {
-          virtue: virtue.name,
-          improvement: improvement,
-        };
-      });
-
-      setImprovements(improvements);
-    } catch (err) {
-      console.error('Error al calcular las mejoras semanales:', err);
-      setError('Hubo un problema al calcular las mejoras semanales.');
-    }
+    return improvements;
   };
 
-  const [improvements, setImprovements] = useState([]);
+  const improvements = calculateWeeklyImprovement();
 
   const getCurrentDay = () => {
     const date = new Date();
@@ -236,7 +183,6 @@ const Calendar = () => {
   return (
     <div className="calendar-container">
       <h2>Semana Actual: {currentWeekVirtue ? currentWeekVirtue.name : 'Cargando...'}</h2>
-      {error && <div className="error-message">{error}</div>}
       <table className="calendar-table">
         <thead>
           <tr>

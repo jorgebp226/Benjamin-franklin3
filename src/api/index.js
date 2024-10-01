@@ -1,115 +1,64 @@
-// src/api.js
+// src/api/index.js
+import { generateClient } from '@aws-amplify/api';
+import { listVirtues, virtueRecordsByVirtueAndDate } from './graphql/queries';
+import { createVirtueRecord, updateVirtueRecord } from './graphql/mutations';
 
-import { generateClient } from '@aws-amplify/api'; // Asegúrate de que esta ruta es correcta
-import {
-  createVirtue,
-  updateVirtue,
-  deleteVirtue,
-  createVirtueRecord,
-  updateVirtueRecord,
-  deleteVirtueRecord
-} from './graphql/mutations';
-import {
-  listVirtueRecords
-} from './graphql/queries';
-
-// Genera una instancia del cliente
+// Crear el cliente GraphQL
 const client = generateClient();
 
-// Función para obtener registros de virtudes dentro de un rango de fechas
-export const getVirtuesWithRecords = async (startDate, endDate) => {
+// Obtener todas las virtudes
+export const getVirtues = async () => {
   try {
-    const filter = {
-      and: [
-        { date: { ge: startDate } },
-        { date: { le: endDate } }
-      ]
-    };
-
-    const response = await client.graphql({
-      query: listVirtueRecords,
-      variables: { filter },
-      authMode: 'AMAZON_COGNITO_USER_POOLS' // Ajusta según tu configuración de autenticación
+    const virtueData = await client.graphql({
+      query: listVirtues,
     });
-
-    return response.data.listVirtueRecords.items;
+    return virtueData.data.listVirtues.items;
   } catch (error) {
-    console.error('Error fetching virtues with records:', error);
+    console.error('Error fetching virtues:', error);
     return [];
   }
 };
 
-// Función para crear un registro de virtud
-export const createVirtueRecordAPI = async (recordInput) => {
+// Obtener registros de virtudes por virtud y rango de fechas
+export const getVirtuesWithRecords = async (startDate, endDate) => {
   try {
-    const response = await client.graphql({
-      query: createVirtueRecord,
-      variables: { input: recordInput },
-      authMode: 'AMAZON_COGNITO_USER_POOLS'
+    const variables = {
+      date: { between: [startDate, endDate] }, // Filtro por rango de fechas
+      sortDirection: 'ASC',
+    };
+    const recordsData = await client.graphql({
+      query: virtueRecordsByVirtueAndDate,
+      variables,
     });
-    return response.data.createVirtueRecord;
+    return recordsData.data.virtueRecordsByVirtueAndDate.items;
+  } catch (error) {
+    console.error('Error fetching virtue records:', error);
+    return [];
+  }
+};
+
+// Crear un nuevo registro de virtud
+export const createVirtueRecordAPI = async (record) => {
+  try {
+    const newRecord = await client.graphql({
+      query: createVirtueRecord,
+      variables: { input: record },
+    });
+    return newRecord.data.createVirtueRecord;
   } catch (error) {
     console.error('Error creating virtue record:', error);
-    throw error;
   }
 };
 
-// Función para actualizar un registro de virtud
-export const updateVirtueRecordAPI = async (recordInput) => {
+// Actualizar un registro de virtud existente
+export const updateVirtueRecordAPI = async (record) => {
   try {
-    const response = await client.graphql({
+    const updatedRecord = await client.graphql({
       query: updateVirtueRecord,
-      variables: { input: recordInput },
-      authMode: 'AMAZON_COGNITO_USER_POOLS'
+      variables: { input: record },
     });
-    return response.data.updateVirtueRecord;
+    return updatedRecord.data.updateVirtueRecord;
   } catch (error) {
     console.error('Error updating virtue record:', error);
-    throw error;
-  }
-};
-
-// Función para crear una virtud
-export const createVirtueAPI = async (virtueInput) => {
-  try {
-    const response = await client.graphql({
-      query: createVirtue,
-      variables: { input: virtueInput },
-      authMode: 'AMAZON_COGNITO_USER_POOLS'
-    });
-    return response.data.createVirtue;
-  } catch (error) {
-    console.error('Error creating virtue:', error);
-    throw error;
-  }
-};
-
-// Función para actualizar una virtud
-export const updateVirtueAPI = async (virtueInput) => {
-  try {
-    const response = await client.graphql({
-      query: updateVirtue,
-      variables: { input: virtueInput },
-      authMode: 'AMAZON_COGNITO_USER_POOLS'
-    });
-    return response.data.updateVirtue;
-  } catch (error) {
-    console.error('Error updating virtue:', error);
-    throw error;
-  }
-};
-
-// Función para eliminar una virtud
-export const deleteVirtueAPI = async (virtueInput) => {
-  try {
-    const response = await client.graphql({
-      query: deleteVirtue,
-      variables: { input: virtueInput },
-      authMode: 'AMAZON_COGNITO_USER_POOLS'
-    });
-    return response.data.deleteVirtue;
-  } catch (error) {
-    console.error('Error deleting virtue:', error);
-    throw error;
   }
 };
