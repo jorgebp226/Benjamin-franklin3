@@ -1,66 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createVirtue = /* GraphQL */ `
-  mutation CreateVirtue(
-    $input: CreateVirtueInput!
-    $condition: ModelVirtueConditionInput
-  ) {
-    createVirtue(input: $input, condition: $condition) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const updateVirtue = /* GraphQL */ `
-  mutation UpdateVirtue(
-    $input: UpdateVirtueInput!
-    $condition: ModelVirtueConditionInput
-  ) {
-    updateVirtue(input: $input, condition: $condition) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const deleteVirtue = /* GraphQL */ `
-  mutation DeleteVirtue(
-    $input: DeleteVirtueInput!
-    $condition: ModelVirtueConditionInput
-  ) {
-    deleteVirtue(input: $input, condition: $condition) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
 export const createVirtueRecord = /* GraphQL */ `
   mutation CreateVirtueRecord(
     $input: CreateVirtueRecordInput!
@@ -68,20 +8,13 @@ export const createVirtueRecord = /* GraphQL */ `
   ) {
     createVirtueRecord(input: $input, condition: $condition) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner
@@ -96,20 +29,13 @@ export const updateVirtueRecord = /* GraphQL */ `
   ) {
     updateVirtueRecord(input: $input, condition: $condition) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner
@@ -124,20 +50,13 @@ export const deleteVirtueRecord = /* GraphQL */ `
   ) {
     deleteVirtueRecord(input: $input, condition: $condition) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner

@@ -23,10 +23,9 @@ const ProgressChart = () => {
     const currentYear = new Date().getFullYear();
     const startDate = getDateFromWeekNumber(startWeek, currentYear);
     const endDate = getDateFromWeekNumber(endWeek, currentYear, true);
-    const data = await getVirtuesWithRecords(
-      startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
-    );
+    const startDateString = startDate.toISOString().split('T')[0];
+    const endDateString = endDate.toISOString().split('T')[0];
+    const data = await getVirtuesWithRecords(startDateString, endDateString);
     setRecords(data);
   };
 
@@ -62,7 +61,7 @@ const ProgressChart = () => {
 
   const calculateWeeklySuccess = (virtueId, weekNumber) => {
     const weekRecords = records.filter(record => record.virtueID === virtueId && record.weekNumber === weekNumber);
-    const successCount = weekRecords.filter(record => record.status === true).length;
+    const successCount = weekRecords.filter(record => record.status === 1).length;
     return (successCount / 7) * 100;
   };
 

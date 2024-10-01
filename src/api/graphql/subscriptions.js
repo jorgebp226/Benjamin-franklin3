@@ -1,66 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateVirtue = /* GraphQL */ `
-  subscription OnCreateVirtue(
-    $filter: ModelSubscriptionVirtueFilterInput
-    $owner: String
-  ) {
-    onCreateVirtue(filter: $filter, owner: $owner) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const onUpdateVirtue = /* GraphQL */ `
-  subscription OnUpdateVirtue(
-    $filter: ModelSubscriptionVirtueFilterInput
-    $owner: String
-  ) {
-    onUpdateVirtue(filter: $filter, owner: $owner) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const onDeleteVirtue = /* GraphQL */ `
-  subscription OnDeleteVirtue(
-    $filter: ModelSubscriptionVirtueFilterInput
-    $owner: String
-  ) {
-    onDeleteVirtue(filter: $filter, owner: $owner) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
 export const onCreateVirtueRecord = /* GraphQL */ `
   subscription OnCreateVirtueRecord(
     $filter: ModelSubscriptionVirtueRecordFilterInput
@@ -68,20 +8,13 @@ export const onCreateVirtueRecord = /* GraphQL */ `
   ) {
     onCreateVirtueRecord(filter: $filter, owner: $owner) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner
@@ -96,20 +29,13 @@ export const onUpdateVirtueRecord = /* GraphQL */ `
   ) {
     onUpdateVirtueRecord(filter: $filter, owner: $owner) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner
@@ -124,20 +50,13 @@ export const onDeleteVirtueRecord = /* GraphQL */ `
   ) {
     onDeleteVirtueRecord(filter: $filter, owner: $owner) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner

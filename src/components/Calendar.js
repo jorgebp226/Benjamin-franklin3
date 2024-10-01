@@ -27,17 +27,15 @@ const Calendar = () => {
   const loadRecords = async () => {
     const today = new Date();
     const startOfWeek = getStartOfWeek(today);
-    const startDate = new Date(startOfWeek);
+    const startDate = startOfWeek.toISOString().split('T')[0];
     const endDate = new Date(startOfWeek);
     endDate.setDate(endDate.getDate() + 6);
+    const endDateString = endDate.toISOString().split('T')[0];
 
-    const data = await getVirtuesWithRecords(
-      startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
-    );
+    const data = await getVirtuesWithRecords(startDate, endDateString);
 
     if (!data || data.length === 0) {
-      // Inicializar registros vacíos para cada virtud y día de la semana
+      // Inicializar registros vacíos con estado 0
       for (const virtue of allVirtues) {
         const weekNumber = getWeekNumber(startOfWeek);
         const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
@@ -46,10 +44,11 @@ const Calendar = () => {
         daysOfWeek.forEach((day, index) => {
           const recordDate = new Date(startOfWeek);
           recordDate.setDate(startOfWeek.getDate() + index);
+          const formattedDate = recordDate.toISOString().split('T')[0];
           newRecords[day] = {
             virtueID: virtue.id,
-            status: null,
-            date: recordDate.toISOString().split('T')[0],
+            status: 0,
+            date: formattedDate,
             weekNumber: weekNumber,
             weekVirtueID: weekVirtueID,
           };
@@ -60,10 +59,7 @@ const Calendar = () => {
         }
       }
       // Recargar los registros después de inicializar
-      const refreshedData = await getVirtuesWithRecords(
-        startDate.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0]
-      );
+      const refreshedData = await getVirtuesWithRecords(startDate, endDateString);
       processRecords(refreshedData);
     } else {
       processRecords(data);
@@ -77,7 +73,10 @@ const Calendar = () => {
         recordsData[record.virtueID] = {};
       }
       const dayName = getDayName(new Date(record.date).getDay());
-      recordsData[record.virtueID][dayName] = record.status;
+      recordsData[record.virtueID][dayName] = {
+        status: record.status,
+        id: record.id,
+      };
     });
     setRecords(recordsData);
   };
@@ -95,20 +94,32 @@ const Calendar = () => {
 
   const handleMark = async (virtueId, day) => {
     const updatedRecords = { ...records };
-    const currentStatus = updatedRecords[virtueId]?.[day];
+    const currentRecord = updatedRecords[virtueId]?.[day];
+    const currentStatus = currentRecord ? currentRecord.status : 0;
+    const currentId = currentRecord ? currentRecord.id : null;
 
     let newStatus;
-    if (currentStatus === true) {
-      newStatus = false;
-    } else if (currentStatus === false) {
-      newStatus = null;
-    } else {
-      newStatus = true;
+
+    // Ciclo de estados: 0 -> 1 -> -1 -> 0
+    if (currentStatus === 0) {
+      newStatus = 1;
+    } else if (currentStatus === 1) {
+      newStatus = -1;
+    } else if (currentStatus === -1) {
+      newStatus = 0;
     }
 
-    updatedRecords[virtueId] = { ...updatedRecords[virtueId], [day]: newStatus };
+    // Actualizar estado localmente
+    updatedRecords[virtueId] = { 
+      ...updatedRecords[virtueId], 
+      [day]: {
+        status: newStatus,
+        id: currentId, // mantener el ID si existe
+      } 
+    };
     setRecords(updatedRecords);
 
+    // Obtener la fecha correspondiente
     const today = new Date();
     const startOfWeek = getStartOfWeek(today);
     const recordDate = new Date(startOfWeek);
@@ -119,28 +130,30 @@ const Calendar = () => {
     const weekNumber = getWeekNumber(startOfWeek);
     const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
 
-    const existingRecords = await getVirtuesWithRecords(formattedDate, formattedDate);
-    const existingRecord = existingRecords.find(
-      (record) => record.virtueID === virtueId && record.date === formattedDate
-    );
-
-    if (existingRecord) {
+    if (currentId) {
+      // Actualizar registro existente
       await updateVirtueRecordAPI({
-        id: existingRecord.id,
-        virtueID: virtueId,
+        id: currentId,
         status: newStatus,
-        date: formattedDate,
         weekNumber: weekNumber,
         weekVirtueID: weekVirtueID,
       });
     } else {
-      await createVirtueRecordAPI({
+      // Crear nuevo registro
+      const newRecord = await createVirtueRecordAPI({
         virtueID: virtueId,
         status: newStatus,
         date: formattedDate,
         weekNumber: weekNumber,
         weekVirtueID: weekVirtueID,
       });
+
+      // Actualizar estado local con el nuevo ID
+      updatedRecords[virtueId][day] = {
+        status: newStatus,
+        id: newRecord.id,
+      };
+      setRecords(updatedRecords);
     }
   };
 
@@ -149,8 +162,8 @@ const Calendar = () => {
       return 0;
     }
 
-    const weekDays = daysOfWeek.map(day => records[virtueId][day]);
-    const successCount = weekDays.filter(status => status === true).length;
+    const weekDays = daysOfWeek.map(day => records[virtueId][day]?.status === 1 ? 1 : 0);
+    const successCount = weekDays.reduce((acc, val) => acc + val, 0);
     return (successCount / 7) * 100;
   };
 
@@ -207,24 +220,24 @@ const Calendar = () => {
                 <td key={day}>
                   <div
                     className={`marker ${
-                      records[virtue.id]?.[day] === true
+                      records[virtue.id]?.[day]?.status === 1
                         ? 'success'
-                        : records[virtue.id]?.[day] === false
+                        : records[virtue.id]?.[day]?.status === -1
                         ? 'error'
                         : ''
                     }`}
                     onClick={() => handleMark(virtue.id, day)}
                     title={
-                      records[virtue.id]?.[day] === true
+                      records[virtue.id]?.[day]?.status === 1
                         ? 'Cumplido'
-                        : records[virtue.id]?.[day] === false
+                        : records[virtue.id]?.[day]?.status === -1
                         ? 'No cumplido'
                         : 'Marcar como cumplido'
                     }
                   >
-                    {records[virtue.id]?.[day] === true
+                    {records[virtue.id]?.[day]?.status === 1
                       ? '🟢'
-                      : records[virtue.id]?.[day] === false
+                      : records[virtue.id]?.[day]?.status === -1
                       ? '🔴'
                       : '⚪️'}
                   </div>

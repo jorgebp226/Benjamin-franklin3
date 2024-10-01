@@ -18,11 +18,10 @@ const Visualization = () => {
   const fetchRecords = async () => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30); // Últimos 30 días
+    const startDateString = startDate.toISOString().split('T')[0];
     const endDate = new Date();
-    const data = await getVirtuesWithRecords(
-      startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
-    );
+    const endDateString = endDate.toISOString().split('T')[0];
+    const data = await getVirtuesWithRecords(startDateString, endDateString);
     setRecords(data);
   };
 
@@ -35,9 +34,9 @@ const Visualization = () => {
     records.forEach((record) => {
       const virtueName = allVirtues.find(v => v.id === record.virtueID)?.name;
       if (virtueName) {
-        if (record.status === true) {
+        if (record.status === 1) {
           stats[virtueName].success += 1;
-        } else if (record.status === false) {
+        } else if (record.status === -1) {
           stats[virtueName].error += 1;
         }
       }

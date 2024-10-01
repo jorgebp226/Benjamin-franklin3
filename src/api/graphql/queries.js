@@ -1,70 +1,17 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getVirtue = /* GraphQL */ `
-  query GetVirtue($id: ID!) {
-    getVirtue(id: $id) {
-      id
-      name
-      description
-      records {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const listVirtues = /* GraphQL */ `
-  query ListVirtues(
-    $id: ID
-    $filter: ModelVirtueFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listVirtues(
-      id: $id
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 export const getVirtueRecord = /* GraphQL */ `
   query GetVirtueRecord($id: ID!) {
     getVirtueRecord(id: $id) {
       id
+      userId
+      dateVirtueID
       virtueID
+      status
       date
       weekNumber
-      status
       weekVirtueID
-      virtue {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
       createdAt
       updatedAt
       owner
@@ -74,25 +21,19 @@ export const getVirtueRecord = /* GraphQL */ `
 `;
 export const listVirtueRecords = /* GraphQL */ `
   query ListVirtueRecords(
-    $id: ID
     $filter: ModelVirtueRecordFilterInput
     $limit: Int
     $nextToken: String
-    $sortDirection: ModelSortDirection
   ) {
-    listVirtueRecords(
-      id: $id
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
+    listVirtueRecords(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        userId
+        dateVirtueID
         virtueID
+        status
         date
         weekNumber
-        status
         weekVirtueID
         createdAt
         updatedAt
@@ -104,18 +45,16 @@ export const listVirtueRecords = /* GraphQL */ `
     }
   }
 `;
-export const virtueRecordsByVirtueAndDate = /* GraphQL */ `
-  query VirtueRecordsByVirtueAndDate(
-    $virtueID: ID!
-    $date: ModelStringKeyConditionInput
+export const virtueRecordsByUser = /* GraphQL */ `
+  query VirtueRecordsByUser(
+    $userId: ID!
     $sortDirection: ModelSortDirection
     $filter: ModelVirtueRecordFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    virtueRecordsByVirtueAndDate(
-      virtueID: $virtueID
-      date: $date
+    virtueRecordsByUser(
+      userId: $userId
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -123,10 +62,46 @@ export const virtueRecordsByVirtueAndDate = /* GraphQL */ `
     ) {
       items {
         id
+        userId
+        dateVirtueID
         virtueID
+        status
         date
         weekNumber
+        weekVirtueID
+        createdAt
+        updatedAt
+        owner
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const virtueRecordsByDateVirtue = /* GraphQL */ `
+  query VirtueRecordsByDateVirtue(
+    $dateVirtueID: String!
+    $sortDirection: ModelSortDirection
+    $filter: ModelVirtueRecordFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    virtueRecordsByDateVirtue(
+      dateVirtueID: $dateVirtueID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        userId
+        dateVirtueID
+        virtueID
         status
+        date
+        weekNumber
         weekVirtueID
         createdAt
         updatedAt
