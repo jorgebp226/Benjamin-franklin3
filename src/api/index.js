@@ -1,27 +1,17 @@
-// src/api/index.js
-
 import { generateClient } from 'aws-amplify/api';
-import { 
+import {
   createVirtueRecord as createVirtueRecordMutation,
   updateVirtueRecord as updateVirtueRecordMutation,
 } from './graphql/mutations';
 import { 
   virtueRecordsByUser as virtueRecordsByUserQuery 
 } from './graphql/queries';
-import { Auth } from 'aws-amplify';
+import { Authenticator } from '@aws-amplify/ui-react';
 
 const client = generateClient();
 
-// Función para obtener el ID del usuario actual
-const getUserId = async () => {
-  const user = await Auth.currentAuthenticatedUser();
-  return user.attributes.sub;
-};
-
 // Obtener registros de virtudes dentro de un rango de fechas
-export const getVirtuesWithRecords = async (startDate, endDate) => {
-  const userId = await getUserId();
-
+export const getVirtuesWithRecords = async (userId, startDate, endDate) => {
   // Formato de dateVirtueID: "YYYY-MM-DD#virtueID"
   const startKey = `${startDate}#`;
   const endKey = `${endDate}#~`; // '~' para incluir todos los virtueIDs en la fecha final
@@ -31,7 +21,7 @@ export const getVirtuesWithRecords = async (startDate, endDate) => {
     variables: {
       userId: userId,
       dateVirtueID: {
-        between: [ startKey, endKey ]
+        between: [startKey, endKey]
       }
     }
   });
@@ -44,10 +34,9 @@ export const getVirtuesWithRecords = async (startDate, endDate) => {
 };
 
 // Crear un nuevo registro de virtud
-export const createVirtueRecordAPI = async (record) => {
+export const createVirtueRecordAPI = async (userId, record) => {
   const { date, virtueID, status, weekNumber, weekVirtueID } = record;
   const dateVirtueID = `${date}#${virtueID}`;
-  const userId = await getUserId();
 
   const input = {
     userId,
@@ -89,3 +78,26 @@ export const updateVirtueRecordAPI = async (record) => {
 
   return result.data.updateVirtueRecord;
 };
+
+// Uso de Authenticator en el componente de React
+
+import React from 'react';
+import { Authenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+
+const VirtueApp = () => {
+  return (
+    <Authenticator>
+      {({ signOut, user }) => (
+        <div>
+          <h1>Bienvenido, {user.username}</h1>
+          <button onClick={signOut}>Cerrar sesión</button>
+          
+          {/* Aquí puedes llamar a las funciones de API pasando `user.attributes.sub` como `userId` */}
+        </div>
+      )}
+    </Authenticator>
+  );
+};
+
+export default VirtueApp;
