@@ -67,8 +67,18 @@ const Calendar = () => {
   };
 
   const processRecords = (data) => {
+    if (!data || data.length === 0) {
+      console.error("No se encontraron registros de virtudes.");
+      return;
+    }
+  
     const recordsData = {};
     data.forEach((record) => {
+      if (!record.date || !record.virtueID) {
+        console.error("Registro inválido, falta 'date' o 'virtueID'.", record);
+        return;
+      }
+      
       if (!recordsData[record.virtueID]) {
         recordsData[record.virtueID] = {};
       }
@@ -80,7 +90,7 @@ const Calendar = () => {
     });
     setRecords(recordsData);
   };
-
+  
   const getDayName = (dayIndex) => {
     return dayIndex === 0 ? 'Domingo' : daysOfWeek[dayIndex - 1];
   };

@@ -35,6 +35,13 @@ export const getVirtuesWithRecords = async (userId, startDate, endDate) => {
 // Crear un nuevo registro de virtud
 export const createVirtueRecordAPI = async (userId, record) => {
   const { date, virtueID, status, weekNumber, weekVirtueID } = record;
+  
+  // Validación para asegurar que todos los campos necesarios están presentes
+  if (!date || !virtueID || status === undefined || !weekNumber || !weekVirtueID) {
+    console.error("Datos incompletos para crear el registro de virtud:", record);
+    return;
+  }
+  
   const dateVirtueID = `${date}#${virtueID}`;
 
   const input = {
@@ -63,6 +70,12 @@ export const updateVirtueRecordAPI = async (record) => {
     throw new Error('Se requiere el ID del registro para actualizar.');
   }
 
+  // Validación para asegurar que todos los campos necesarios están presentes
+  if (status === undefined || !weekNumber || !weekVirtueID) {
+    console.error("Datos incompletos para actualizar el registro de virtud:", record);
+    return;
+  }
+
   const input = {
     id,
     status,
@@ -76,4 +89,18 @@ export const updateVirtueRecordAPI = async (record) => {
   });
 
   return result.data.updateVirtueRecord;
+};
+
+// Ejemplo de una función que estaba generando el error
+const $b = (t) => {
+  // Validación para asegurarse de que 't' está definido y contiene 'date'
+  if (!t || !t.date) {
+    console.error("El objeto 't' es undefined o no tiene la propiedad 'date'");
+    return; // Evitar que el código continúe si 't' no está definido
+  }
+
+  const { date, ...rest } = t;
+  // Continúa con la lógica después de validar que 't' tiene la propiedad 'date'
+  console.log("Fecha procesada:", date);
+  // Aquí puedes seguir con el resto de la lógica que depende de 'date'
 };
