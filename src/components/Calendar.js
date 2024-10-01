@@ -37,6 +37,7 @@ const Calendar = () => {
     );
 
     if (!data || data.length === 0) {
+      // Inicializar registros vacíos para cada virtud y día de la semana
       for (const virtue of allVirtues) {
         const weekNumber = getWeekNumber(startOfWeek);
         const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
@@ -51,13 +52,6 @@ const Calendar = () => {
             date: recordDate.toISOString().split('T')[0],
             weekNumber: weekNumber,
             weekVirtueID: weekVirtueID,
-            virtue: {
-              id: virtue.id,
-              name: virtue.name,
-              description: virtue.description || '',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            },
           };
         });
 
@@ -65,6 +59,7 @@ const Calendar = () => {
           await createVirtueRecordAPI(newRecords[day]);
         }
       }
+      // Recargar los registros después de inicializar
       const refreshedData = await getVirtuesWithRecords(
         startDate.toISOString().split('T')[0],
         endDate.toISOString().split('T')[0]
@@ -129,8 +124,6 @@ const Calendar = () => {
       (record) => record.virtueID === virtueId && record.date === formattedDate
     );
 
-    const currentVirtue = allVirtues.find((v) => v.id === virtueId);
-
     if (existingRecord) {
       await updateVirtueRecordAPI({
         id: existingRecord.id,
@@ -139,12 +132,6 @@ const Calendar = () => {
         date: formattedDate,
         weekNumber: weekNumber,
         weekVirtueID: weekVirtueID,
-        virtue: {
-          id: virtueId,
-          name: currentVirtue.name,
-          description: currentVirtue.description || '',
-          updatedAt: new Date().toISOString(),
-        },
       });
     } else {
       await createVirtueRecordAPI({
@@ -153,13 +140,6 @@ const Calendar = () => {
         date: formattedDate,
         weekNumber: weekNumber,
         weekVirtueID: weekVirtueID,
-        virtue: {
-          id: virtueId,
-          name: currentVirtue.name,
-          description: currentVirtue.description || '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
       });
     }
   };
@@ -181,7 +161,7 @@ const Calendar = () => {
 
     const improvements = allVirtues.map((virtue) => {
       const currentWeekSuccess = calculateSuccess(virtue.id);
-      const previousWeekSuccess = 0;
+      const previousWeekSuccess = 0; // Implementar lógica para obtener la semana anterior si es necesario
 
       return {
         virtue: virtue.name,
