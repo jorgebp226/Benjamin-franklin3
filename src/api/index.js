@@ -1,6 +1,6 @@
 // src/api/index.js
 import { generateClient } from '@aws-amplify/api';
-import { listVirtues, getVirtueRecordsByVirtueAndDate } from './graphql/queries';
+import { listVirtues, virtueRecordsByVirtueAndDate } from './graphql/queries';
 import { createVirtueRecord, updateVirtueRecord } from './graphql/mutations';
 
 // Crear el cliente GraphQL
@@ -27,7 +27,7 @@ export const getVirtuesWithRecords = async (startDate, endDate) => {
       sortDirection: 'ASC',
     };
     const recordsData = await client.graphql({
-      query: getVirtueRecordsByVirtueAndDate,
+      query: virtueRecordsByVirtueAndDate,
       variables,
     });
     return recordsData.data.virtueRecordsByVirtueAndDate.items;
