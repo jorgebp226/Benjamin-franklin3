@@ -6,7 +6,6 @@ import {
 import { 
   virtueRecordsByUser as virtueRecordsByUserQuery 
 } from './graphql/queries';
-import { Authenticator } from '@aws-amplify/ui-react';
 
 const client = generateClient();
 
@@ -78,26 +77,3 @@ export const updateVirtueRecordAPI = async (record) => {
 
   return result.data.updateVirtueRecord;
 };
-
-// Uso de Authenticator en el componente de React
-
-import React from 'react';
-import { Authenticator } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
-
-const VirtueApp = () => {
-  return (
-    <Authenticator>
-      {({ signOut, user }) => (
-        <div>
-          <h1>Bienvenido, {user.username}</h1>
-          <button onClick={signOut}>Cerrar sesión</button>
-          
-          {/* Aquí puedes llamar a las funciones de API pasando `user.attributes.sub` como `userId` */}
-        </div>
-      )}
-    </Authenticator>
-  );
-};
-
-export default VirtueApp;
