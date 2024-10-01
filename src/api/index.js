@@ -1,6 +1,6 @@
 // src/api/index.js
 
-import { generateClient } from 'aws-amplify';
+import { generateClient } from 'aws-amplify/api';
 import { 
   createVirtueRecord as createVirtueRecordMutation,
   updateVirtueRecord as updateVirtueRecordMutation,
