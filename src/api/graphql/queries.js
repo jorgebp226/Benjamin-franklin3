@@ -1,5 +1,4 @@
-/* eslint-disable */
-// this is an auto generated file. This will be overwritten
+// src/graphql/queries.js
 
 export const getVirtue = /* GraphQL */ `
   query GetVirtue($id: ID!) {
@@ -18,16 +17,15 @@ export const getVirtue = /* GraphQL */ `
     }
   }
 `;
+
 export const listVirtues = /* GraphQL */ `
   query ListVirtues(
-    $id: ID
     $filter: ModelVirtueFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
     listVirtues(
-      id: $id
       filter: $filter
       limit: $limit
       nextToken: $nextToken
@@ -47,6 +45,7 @@ export const listVirtues = /* GraphQL */ `
     }
   }
 `;
+
 export const getVirtueRecord = /* GraphQL */ `
   query GetVirtueRecord($id: ID!) {
     getVirtueRecord(id: $id) {
@@ -72,16 +71,15 @@ export const getVirtueRecord = /* GraphQL */ `
     }
   }
 `;
+
 export const listVirtueRecords = /* GraphQL */ `
   query ListVirtueRecords(
-    $id: ID
     $filter: ModelVirtueRecordFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
     listVirtueRecords(
-      id: $id
       filter: $filter
       limit: $limit
       nextToken: $nextToken
@@ -104,6 +102,7 @@ export const listVirtueRecords = /* GraphQL */ `
     }
   }
 `;
+
 export const virtueRecordsByVirtueAndDate = /* GraphQL */ `
   query VirtueRecordsByVirtueAndDate(
     $virtueID: ID!

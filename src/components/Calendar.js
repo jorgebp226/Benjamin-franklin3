@@ -1,7 +1,12 @@
 // src/components/Calendar.js
+
 import React, { useState, useEffect } from 'react';
 import { virtues as allVirtues } from '../utils/virtues';
-import { getVirtuesWithRecords, createVirtueRecordAPI, updateVirtueRecordAPI } from '../api';
+import { 
+  getVirtuesWithRecords, 
+  createVirtueRecordAPI, 
+  updateVirtueRecordAPI 
+} from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './Calendar.css';
 
@@ -26,47 +31,46 @@ const Calendar = () => {
 
   const loadRecords = async () => {
     const today = new Date();
-    const startOfWeek = getStartOfWeek(today);
-    const startDate = new Date(startOfWeek);
-    const endDate = new Date(startOfWeek);
-    endDate.setDate(endDate.getDate() + 6);
+    const startOfWeekDate = getStartOfWeek(today);
+    const startDate = startOfWeekDate.toISOString().split('T')[0];
+    const endDateObj = new Date(startOfWeekDate);
+    endDateObj.setDate(endDateObj.getDate() + 6);
+    const endDate = endDateObj.toISOString().split('T')[0];
 
-    const data = await getVirtuesWithRecords(
-      startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
-    );
+    const data = await getVirtuesWithRecords(startDate, endDate);
 
     if (!data || data.length === 0) {
       // Inicializar registros vacíos para cada virtud y día de la semana
-      for (const virtue of allVirtues) {
-        const weekNumber = getWeekNumber(startOfWeek);
-        const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
-
-        const newRecords = {};
-        daysOfWeek.forEach((day, index) => {
-          const recordDate = new Date(startOfWeek);
-          recordDate.setDate(startOfWeek.getDate() + index);
-          newRecords[day] = {
-            virtueID: virtue.id,
-            status: null,
-            date: recordDate.toISOString().split('T')[0],
-            weekNumber: weekNumber,
-            weekVirtueID: weekVirtueID,
-          };
-        });
-
-        for (const day in newRecords) {
-          await createVirtueRecordAPI(newRecords[day]);
-        }
-      }
+      await initializeEmptyRecords(startOfWeekDate);
       // Recargar los registros después de inicializar
-      const refreshedData = await getVirtuesWithRecords(
-        startDate.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0]
-      );
+      const refreshedData = await getVirtuesWithRecords(startDate, endDate);
       processRecords(refreshedData);
     } else {
       processRecords(data);
+    }
+  };
+
+  const initializeEmptyRecords = async (startOfWeek) => {
+    const weekNumber = getWeekNumber(startOfWeek);
+    const weekVirtue = allVirtues[(weekNumber - 1) % allVirtues.length];
+    const weekVirtueID = weekVirtue.id;
+
+    for (const virtue of allVirtues) {
+      for (let index = 0; index < daysOfWeek.length; index++) {
+        const recordDate = new Date(startOfWeek);
+        recordDate.setDate(startOfWeek.getDate() + index);
+        const formattedDate = recordDate.toISOString().split('T')[0];
+
+        const newRecord = {
+          virtueID: virtue.id,
+          status: null,
+          date: formattedDate,
+          weekNumber: weekNumber,
+          weekVirtueID: weekVirtueID,
+        };
+
+        await createVirtueRecordAPI(newRecord);
+      }
     }
   };
 
@@ -119,8 +123,15 @@ const Calendar = () => {
     const weekNumber = getWeekNumber(startOfWeek);
     const weekVirtueID = allVirtues[(weekNumber - 1) % allVirtues.length].id;
 
-    const existingRecords = await getVirtuesWithRecords(formattedDate, formattedDate);
-    const existingRecord = existingRecords.find(
+    // Obtener el registro existente para esta virtud y fecha
+    const filter = {
+      virtueID: { eq: virtueId },
+      date: { eq: formattedDate }
+    };
+
+    const response = await API.graphql(graphqlOperation(listVirtueRecords, { filter }));
+
+    const existingRecord = response.data.listVirtueRecords.items.find(
       (record) => record.virtueID === virtueId && record.date === formattedDate
     );
 

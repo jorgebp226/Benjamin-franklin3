@@ -1,5 +1,4 @@
-/* eslint-disable */
-// this is an auto generated file. This will be overwritten
+// src/graphql/mutations.js
 
 export const createVirtue = /* GraphQL */ `
   mutation CreateVirtue(
@@ -21,6 +20,7 @@ export const createVirtue = /* GraphQL */ `
     }
   }
 `;
+
 export const updateVirtue = /* GraphQL */ `
   mutation UpdateVirtue(
     $input: UpdateVirtueInput!
@@ -41,6 +41,7 @@ export const updateVirtue = /* GraphQL */ `
     }
   }
 `;
+
 export const deleteVirtue = /* GraphQL */ `
   mutation DeleteVirtue(
     $input: DeleteVirtueInput!
@@ -61,6 +62,7 @@ export const deleteVirtue = /* GraphQL */ `
     }
   }
 `;
+
 export const createVirtueRecord = /* GraphQL */ `
   mutation CreateVirtueRecord(
     $input: CreateVirtueRecordInput!
@@ -89,6 +91,7 @@ export const createVirtueRecord = /* GraphQL */ `
     }
   }
 `;
+
 export const updateVirtueRecord = /* GraphQL */ `
   mutation UpdateVirtueRecord(
     $input: UpdateVirtueRecordInput!
@@ -117,6 +120,7 @@ export const updateVirtueRecord = /* GraphQL */ `
     }
   }
 `;
+
 export const deleteVirtueRecord = /* GraphQL */ `
   mutation DeleteVirtueRecord(
     $input: DeleteVirtueRecordInput!
