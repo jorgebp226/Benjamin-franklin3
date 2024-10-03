@@ -56,7 +56,7 @@ export const createInitialVirtueRecords = async (userId, weekId, weekNumber, wee
 };
 
 // Renombrar la función localmente para evitar conflicto
-export const updateVirtueStatusCustomLocal = async (id, dayIndex, virtueId, newStatus) => {
+export const updateVirtueStatusCustom = async (id, dayIndex, virtueId, newStatus) => {
   try {
     const result = await client.graphql({
       query: updateVirtueStatusGraphQL,  // Usar la importación con el nombre cambiado
