@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { virtues as allVirtues } from '../utils/virtues';
@@ -13,49 +13,66 @@ const ProgressChart = () => {
   const [selectedVirtues, setSelectedVirtues] = useState(allVirtues.map(v => v.id));
   const [startWeek, setStartWeek] = useState(1);
   const [endWeek, setEndWeek] = useState(13);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchRecords();
   }, [startWeek, endWeek]);
 
   const fetchRecords = async () => {
-    const currentYear = new Date().getFullYear();
-    const userId = 'currentUserId'; // Asume que tienes acceso al ID del usuario actual
-    let allRecords = [];
+    setIsLoading(true);
+    setError(null);
+    try {
+      const currentYear = new Date().getFullYear();
+      const userId = 'currentUserId'; // Asume que tienes acceso al ID del usuario actual
+      let allRecords = [];
 
-    for (let week = startWeek; week <= endWeek; week++) {
-      const weekId = `${currentYear}-W${week.toString().padStart(2, '0')}`;
-      const weekRecords = await getVirtueRecordsForWeek(userId, weekId);
-      allRecords = [...allRecords, ...weekRecords];
+      for (let week = startWeek; week <= endWeek; week++) {
+        const weekId = `${currentYear}-W${week.toString().padStart(2, '0')}`;
+        const weekRecords = await getVirtueRecordsForWeek(userId, weekId);
+        if (Array.isArray(weekRecords)) {
+          allRecords = [...allRecords, ...weekRecords];
+        } else {
+          console.error('Unexpected data structure for week', week, weekRecords);
+        }
+      }
+
+      setRecords(allRecords);
+    } catch (err) {
+      console.error('Error fetching records:', err);
+      setError('Failed to fetch records. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setRecords(allRecords);
   };
 
   const handleVirtueSelection = (virtueId) => {
-    const updatedSelection = selectedVirtues.includes(virtueId)
-      ? selectedVirtues.filter(id => id !== virtueId)
-      : [...selectedVirtues, virtueId];
-    setSelectedVirtues(updatedSelection);
+    setSelectedVirtues(prev => 
+      prev.includes(virtueId) ? prev.filter(id => id !== virtueId) : [...prev, virtueId]
+    );
   };
 
   const handleWeekChange = (e) => {
     const { name, value } = e.target;
+    const numValue = Number(value);
     if (name === 'startWeek') {
-      setStartWeek(Number(value));
+      setStartWeek(numValue > endWeek ? endWeek : numValue);
     } else if (name === 'endWeek') {
-      setEndWeek(Number(value));
+      setEndWeek(numValue < startWeek ? startWeek : numValue);
     }
   };
 
-  const calculateWeeklySuccess = (virtueId, weekNumber) => {
-    const weekRecords = records.filter(record => record.virtueID === virtueId && record.weekNumber === weekNumber);
-    if (weekRecords.length === 0) return 0;
-    const successCount = weekRecords[0].weekStatus.filter(status => status === 1).length;
-    return (successCount / 7) * 100;
-  };
+  const calculateWeeklySuccess = useMemo(() => {
+    return (virtueId, weekNumber) => {
+      const weekRecord = records.find(record => record.virtueID === virtueId && record.weekNumber === weekNumber);
+      if (!weekRecord) return 0;
+      const successCount = weekRecord.weekStatus.filter(status => status === 1).length;
+      return (successCount / 7) * 100;
+    };
+  }, [records]);
 
-  const chartData = {
+  const chartData = useMemo(() => ({
     labels: Array.from({ length: endWeek - startWeek + 1 }, (_, i) => `Semana ${startWeek + i}`),
     datasets: selectedVirtues.map((virtueId) => {
       const virtue = allVirtues.find(v => v.id === virtueId);
@@ -64,12 +81,12 @@ const ProgressChart = () => {
       });
 
       return {
-        label: virtue.name,
+        label: virtue ? virtue.name : 'Unknown Virtue',
         data: dataPoints,
         backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
       };
     }),
-  };
+  }), [selectedVirtues, startWeek, endWeek, calculateWeeklySuccess]);
 
   const chartOptions = {
     responsive: true,
@@ -110,6 +127,9 @@ const ProgressChart = () => {
       },
     },
   };
+
+  if (isLoading) return <div>Cargando datos...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="progress-chart-container">
