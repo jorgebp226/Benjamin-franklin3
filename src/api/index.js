@@ -20,7 +20,7 @@ export const getVirtueRecordsForWeek = async (userId, weekId) => {
   }
 };
 
-export const createInitialVirtueRecords = async (userId, weekId, weekNumber, weekVirtueId, year) => {
+export const createInitialVirtueRecords = async (userId, weekId, weekVirtueId) => {
   const startOfWeek = getStartOfWeek(new Date());
   const days = {};
 
@@ -43,8 +43,6 @@ export const createInitialVirtueRecords = async (userId, weekId, weekNumber, wee
         input: {
           userId,
           weekId,
-          weekNumber,
-          year,
           weekVirtueId,
           days: JSON.stringify(days),
         },

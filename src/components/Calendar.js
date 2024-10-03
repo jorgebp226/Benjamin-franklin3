@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { virtues as allVirtues } from '../utils/virtues';
-import { getVirtueRecordsForWeek, createInitialVirtueRecords, updateVirtueStatusCustom } from '../api';
+import { getVirtueRecordsForWeek, createInitialVirtueRecords, updateVirtueStatusCall } from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './Calendar.css';
 
@@ -33,17 +33,12 @@ const Calendar = ({ userId }) => {
   
     let weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
   
-    if (weekRecords.length === 0) {
-      await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekNumber, currentWeek.weekVirtueID, currentWeek.year);
-      weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);  // Recarga los registros
+    if (!weekRecords) {
+      await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekVirtueID);
+      weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
     }
   
-    const formattedRecords = {};
-    weekRecords.forEach(record => {
-      formattedRecords[record.virtueID] = record;
-    });
-  
-    setRecords(formattedRecords);
+    setRecords(weekRecords);
   };
   
   const toggleDescription = (virtueId) => {
@@ -54,16 +49,24 @@ const Calendar = ({ userId }) => {
   };
 
   const handleMark = async (virtueId, dayIndex) => {
-    const record = records[virtueId];
-    const currentStatus = record.weekStatus[dayIndex];
+    const currentStatus = records.days[dayIndex].virtues[virtueId].status;
     let newStatus = currentStatus === 0 ? 1 : currentStatus === 1 ? -1 : 0;
 
-    const updatedRecord = await updateVirtueStatusCustom(record.id, dayIndex, virtueId, newStatus);
+    const updatedRecord = await updateVirtueStatusCall(records.id, dayIndex, virtueId, newStatus);
 
     if (updatedRecord) {
       setRecords(prev => ({
         ...prev,
-        [virtueId]: updatedRecord,
+        days: {
+          ...prev.days,
+          [dayIndex]: {
+            ...prev.days[dayIndex],
+            virtues: {
+              ...prev.days[dayIndex].virtues,
+              [virtueId]: { status: newStatus }
+            }
+          }
+        }
       }));
     }
   };
