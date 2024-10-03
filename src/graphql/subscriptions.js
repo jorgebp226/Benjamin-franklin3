@@ -10,6 +10,8 @@ export const onCreateVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
+      weekNumber
+      year
       weekVirtueId
       days
       createdAt
@@ -28,6 +30,8 @@ export const onUpdateVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
+      weekNumber
+      year
       weekVirtueId
       days
       createdAt
@@ -46,6 +50,8 @@ export const onDeleteVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
+      weekNumber
+      year
       weekVirtueId
       days
       createdAt

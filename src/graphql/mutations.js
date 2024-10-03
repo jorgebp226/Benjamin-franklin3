@@ -1,25 +1,16 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const updateVirtueRecordStatus = /* GraphQL */ `
-  mutation UpdateVirtueRecordStatus(
-    $id: ID!
-    $dayIndex: Int!
-    $newStatus: Int!
-  ) {
-    updateVirtueRecordStatus(
-      id: $id
-      dayIndex: $dayIndex
-      newStatus: $newStatus
-    ) {
+export const updateVirtueStatus = /* GraphQL */ `
+  mutation UpdateVirtueStatus($input: UpdateVirtueStatusInput!) {
+    updateVirtueStatus(input: $input) {
       id
       userId
       weekId
-      virtueID
-      weekStatus
       weekNumber
-      weekVirtueID
       year
+      weekVirtueId
+      days
       createdAt
       updatedAt
       owner
@@ -36,11 +27,10 @@ export const createVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
-      virtueID
-      weekStatus
       weekNumber
-      weekVirtueID
       year
+      weekVirtueId
+      days
       createdAt
       updatedAt
       owner
@@ -57,11 +47,10 @@ export const updateVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
-      virtueID
-      weekStatus
       weekNumber
-      weekVirtueID
       year
+      weekVirtueId
+      days
       createdAt
       updatedAt
       owner
@@ -78,24 +67,8 @@ export const deleteVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
-      virtueID
-      weekStatus
       weekNumber
-      weekVirtueID
       year
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const updateVirtueStatusCustom = /* GraphQL */ `
-  mutation UpdateVirtueStatusCustom($input: UpdateVirtueStatusInput!) {
-    updateVirtueStatusCustom(input: $input) {
-      id
-      userId
-      weekId
       weekVirtueId
       days
       createdAt

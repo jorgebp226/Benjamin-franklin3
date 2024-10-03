@@ -7,6 +7,8 @@ export const getVirtueRecordByUserAndWeek = /* GraphQL */ `
       id
       userId
       weekId
+      weekNumber
+      year
       weekVirtueId
       days
       createdAt
@@ -22,6 +24,8 @@ export const getVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
+      weekNumber
+      year
       weekVirtueId
       days
       createdAt
@@ -42,6 +46,8 @@ export const listVirtueRecords = /* GraphQL */ `
         id
         userId
         weekId
+        weekNumber
+        year
         weekVirtueId
         days
         createdAt
@@ -75,6 +81,8 @@ export const virtueRecordsByUserIdAndWeekId = /* GraphQL */ `
         id
         userId
         weekId
+        weekNumber
+        year
         weekVirtueId
         days
         createdAt

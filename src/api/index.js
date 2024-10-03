@@ -1,7 +1,7 @@
-// index.js
 import { generateClient } from 'aws-amplify/api';
-import { getVirtueRecordByUserAndWeek } from '../graphql/queries';
-import { createVirtueRecord, updateVirtueStatusCustom as updateVirtueStatusGraphQL } from '../graphql/mutations'; // Cambié el nombre aquí
+import { getVirtueRecordByUserAndWeek } from './queries';
+import { createVirtueRecord } from './mutations';
+import { updateVirtueStatus } from '../graphql/mutations';
 import { virtues } from '../utils/virtues';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 
@@ -20,7 +20,7 @@ export const getVirtueRecordsForWeek = async (userId, weekId) => {
   }
 };
 
-export const createInitialVirtueRecords = async (userId, weekId, weekNumber, weekVirtueID, year) => {
+export const createInitialVirtueRecords = async (userId, weekId, weekNumber, weekVirtueId, year) => {
   const startOfWeek = getStartOfWeek(new Date());
   const days = {};
 
@@ -43,7 +43,9 @@ export const createInitialVirtueRecords = async (userId, weekId, weekNumber, wee
         input: {
           userId,
           weekId,
-          weekVirtueId: weekVirtueID,
+          weekNumber,
+          year,
+          weekVirtueId,
           days: JSON.stringify(days),
         },
       },
@@ -55,11 +57,10 @@ export const createInitialVirtueRecords = async (userId, weekId, weekNumber, wee
   }
 };
 
-// Renombrar la función localmente para evitar conflicto
-export const updateVirtueStatusCustom = async (id, dayIndex, virtueId, newStatus) => {
+export const updateVirtueStatusCall = async (id, dayIndex, virtueId, newStatus) => {
   try {
     const result = await client.graphql({
-      query: updateVirtueStatusGraphQL,  // Usar la importación con el nombre cambiado
+      query: updateVirtueStatus,
       variables: {
         input: {
           id,
@@ -69,7 +70,7 @@ export const updateVirtueStatusCustom = async (id, dayIndex, virtueId, newStatus
         },
       },
     });
-    return result.data.updateVirtueStatusCustom;
+    return result.data.updateVirtueStatus;
   } catch (error) {
     console.error('Error updating virtue status:', error);
     return null;
