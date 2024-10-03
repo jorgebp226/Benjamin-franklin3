@@ -1,0 +1,34 @@
+type VirtueRecord @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  userId: ID! @index(name: "byUserAndWeek", sortKeyFields: ["weekId"])
+  weekId: String!
+  year: Int!
+  weekNumber: Int!
+  weekVirtueId: String!
+  days: [DayRecord!]!
+}
+
+type DayRecord {
+  date: AWSDate!
+  virtues: [VirtueStatus!]!
+}
+
+type VirtueStatus {
+  virtueId: String!
+  status: Int!
+}
+
+input UpdateVirtueStatusInput {
+  id: ID!
+  date: AWSDate!
+  virtueId: String!
+  newStatus: Int!
+}
+
+type Mutation {
+  updateVirtueStatus(input: UpdateVirtueStatusInput!): VirtueRecord
+}
+
+type Query {
+  getVirtueRecordByUserAndWeek(userId: ID!, weekId: String!): VirtueRecord
+}

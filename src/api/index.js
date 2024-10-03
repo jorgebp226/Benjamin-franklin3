@@ -26,20 +26,21 @@ export const getVirtueRecordsForWeek = async (userId, weekId) => {
   }
 };
 
-export const createInitialVirtueRecords = async (userId, weekId, weekVirtueId) => {
+export const createInitialVirtueRecords = async (userId, currentWeek) => {
+  const { weekId, year, weekNumber, weekVirtueID } = currentWeek;
   const startOfWeek = getStartOfWeek(new Date());
-  const days = {};
+  const days = [];
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startOfWeek);
     date.setDate(date.getDate() + i);
-    days[i] = {
-      date: date.toISOString(),
-      virtues: virtues.reduce((acc, virtue) => {
-        acc[virtue.id] = { status: 0 };
-        return acc;
-      }, {}),
-    };
+    days.push({
+      date: date.toISOString().split('T')[0], // Formato YYYY-MM-DD
+      virtues: virtues.map(virtue => ({
+        virtueId: virtue.id,
+        status: 0
+      }))
+    });
   }
 
   try {
@@ -49,26 +50,28 @@ export const createInitialVirtueRecords = async (userId, weekId, weekVirtueId) =
         input: {
           userId,
           weekId,
-          weekVirtueId,
-          days: JSON.stringify(days),
+          year,
+          weekNumber,
+          weekVirtueId: weekVirtueID,
+          days
         },
       },
     });
     return result.data.createVirtueRecord;
   } catch (error) {
-    console.error('Error creating initial virtue records:', error);
+    console.error('Error al crear registros iniciales de virtudes:', error);
     return null;
   }
 };
 
-export const updateVirtueStatusCall = async (id, dayIndex, virtueId, newStatus) => {
+export const updateVirtueStatusCall = async (id, date, virtueId, newStatus) => {
   try {
     const result = await client.graphql({
       query: updateVirtueStatus,
       variables: {
         input: {
           id,
-          dayIndex,
+          date,
           virtueId,
           newStatus,
         },
@@ -76,7 +79,7 @@ export const updateVirtueStatusCall = async (id, dayIndex, virtueId, newStatus) 
     });
     return result.data.updateVirtueStatus;
   } catch (error) {
-    console.error('Error updating virtue status:', error);
+    console.error('Error al actualizar el estado de la virtud:', error);
     return null;
   }
 };

@@ -42,7 +42,4 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
-# Excluir directorios y archivos de Amplify
-amplify/
-aws-exports.js
-.amplify/
+#amplify-do-not-edit-end

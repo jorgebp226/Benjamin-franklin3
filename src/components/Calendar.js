@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { virtues as allVirtues } from '../utils/virtues';
-import { getVirtueRecordsForWeek, createInitialVirtueRecords, updateVirtueStatusCall } from '../api';
+import { getVirtueRecordByUserAndWeek, createInitialVirtueRecords } from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './Calendar.css';
 
@@ -8,7 +8,7 @@ const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sába
 
 const Calendar = ({ userId }) => {
   const [currentWeekVirtue, setCurrentWeekVirtue] = useState(null);
-  const [records, setRecords] = useState({});
+  const [records, setRecords] = useState(null);
   const [showDescription, setShowDescription] = useState({});
   const [currentWeek, setCurrentWeek] = useState(null);
 
@@ -32,26 +32,25 @@ const Calendar = ({ userId }) => {
     if (!currentWeek) return;
 
     try {
-      let weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
+      let weekRecords = await getVirtueRecordByUserAndWeek(userId, currentWeek.weekId);
 
       if (!weekRecords) {
-        console.log('Creating initial records for the week');
-        await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekVirtueID);
-        weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
+        console.log('Creando registros iniciales para la semana');
+        weekRecords = await createInitialVirtueRecords(userId, currentWeek);
       }
 
       if (weekRecords) {
         setRecords(weekRecords);
       } else {
-        console.error('Failed to load or create records for the week');
-        setRecords({}); // Set empty records to avoid errors in rendering
+        console.error('Error al cargar o crear registros para la semana');
+        setRecords(null);
       }
     } catch (error) {
-      console.error('Error in loadRecords:', error);
-      setRecords({}); // Set empty records to avoid errors in rendering
+      console.error('Error en loadRecords:', error);
+      setRecords(null);
     }
   };
-  
+
   const toggleDescription = (virtueId) => {
     setShowDescription((prevState) => ({
       ...prevState,
@@ -110,7 +109,6 @@ const Calendar = ({ userId }) => {
     const day = date.getDay();
     return day === 0 ? 'Domingo' : daysOfWeek[day - 1];
   };
-
 
   if (!currentWeek) return <div>Cargando...</div>;
 
@@ -192,6 +190,5 @@ const Calendar = ({ userId }) => {
     </div>
   );
 };
-
 
 export default Calendar;
