@@ -5,19 +5,19 @@ import './Visualization.css';
 import { getWeekNumber } from '../utils/dateUtils';
 
 const Visualization = () => {
-  const [weekRecords, setWeekRecords] = useState([]);
+  const [weekRecord, setWeekRecord] = useState(null);
   const [currentWeek, setCurrentWeek] = useState(getWeekNumber(new Date()));
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    fetchWeekRecords();
+    fetchWeekRecord();
   }, [currentWeek, currentYear]);
 
-  const fetchWeekRecords = async () => {
+  const fetchWeekRecord = async () => {
     const userId = 'currentUserId'; // Asume que tienes acceso al ID del usuario actual
     const weekId = `${currentYear}-W${currentWeek.toString().padStart(2, '0')}`;
-    const records = await getVirtueRecordsForWeek(userId, weekId);
-    setWeekRecords(records);
+    const record = await getVirtueRecordsForWeek(userId, weekId);
+    setWeekRecord(record);
   };
 
   const handleWeekChange = (increment) => {
@@ -37,20 +37,17 @@ const Visualization = () => {
   };
 
   const renderVirtueStatus = (virtue) => {
-    if (!weekRecords || weekRecords.length === 0) return <div>No records found for this week.</div>;
-  
-    const record = weekRecords.find(r => r.virtueID === virtue.id);
-    if (!record) return <div>No record found for virtue {virtue.name}</div>;
+    if (!weekRecord) return <div>No records found for this week.</div>;
   
     return (
       <div key={virtue.id} className="virtue-row">
         <span className="virtue-name">{virtue.name}</span>
         <div className="virtue-status">
-          {record.weekStatus.map((status, index) => (
+          {Object.values(weekRecord.days).map((day, index) => (
             <div
               key={index}
-              className={`status-dot ${status === 1 ? 'success' : 'failure'}`}
-              title={`Día ${index + 1}: ${status === 1 ? 'Éxito' : 'Fallo'}`}
+              className={`status-dot ${day.virtues[virtue.id].status === 1 ? 'success' : day.virtues[virtue.id].status === -1 ? 'failure' : ''}`}
+              title={`Día ${index + 1}: ${day.virtues[virtue.id].status === 1 ? 'Éxito' : day.virtues[virtue.id].status === -1 ? 'Fallo' : 'No marcado'}`}
             />
           ))}
         </div>

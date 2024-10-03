@@ -72,16 +72,15 @@ const Calendar = ({ userId }) => {
   };
 
   const calculateSuccess = (virtueId) => {
-    if (!records[virtueId]) {
+    if (!records || !records.days) {
       return 0;
     }
 
-    const successCount = records[virtueId].weekStatus.filter(status => status === 1).length;
+    const successCount = Object.values(records.days).filter(day => day.virtues[virtueId].status === 1).length;
     return (successCount / 7) * 100;
   };
 
   const calculateWeeklyImprovement = () => {
-    // Nota: Esta función ahora solo calcula el éxito actual, ya que no tenemos datos de la semana anterior
     return allVirtues.map((virtue) => ({
       virtue: virtue.name,
       improvement: calculateSuccess(virtue.id),

@@ -10,107 +10,55 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const ProgressChart = () => {
   const [records, setRecords] = useState([]);
-  const [selectedVirtues, setSelectedVirtues] = useState(allVirtues.map(v => v.id));
   const [startWeek, setStartWeek] = useState(1);
-  const [endWeek, setEndWeek] = useState(13);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [endWeek, setEndWeek] = useState(getWeekNumber(new Date()));
+  const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     fetchRecords();
-  }, [startWeek, endWeek]);
+  }, [startWeek, endWeek, year]);
 
   const fetchRecords = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const currentYear = new Date().getFullYear();
-      const userId = 'currentUserId'; // Asume que tienes acceso al ID del usuario actual
-      let allRecords = [];
-
-      for (let week = startWeek; week <= endWeek; week++) {
-        const weekId = `${currentYear}-W${week.toString().padStart(2, '0')}`;
-        const weekRecords = await getVirtueRecordsForWeek(userId, weekId);
-        if (Array.isArray(weekRecords)) {
-          allRecords = [...allRecords, ...weekRecords];
-        } else {
-          console.error('Unexpected data structure for week', week, weekRecords);
-        }
+    const userId = 'currentUserId'; // Asume que tienes acceso al ID del usuario actual
+    const fetchedRecords = [];
+    for (let week = startWeek; week <= endWeek; week++) {
+      const weekId = `${year}-W${week.toString().padStart(2, '0')}`;
+      const record = await getVirtueRecordsForWeek(userId, weekId);
+      if (record) {
+        fetchedRecords.push(record);
       }
-
-      setRecords(allRecords);
-    } catch (err) {
-      console.error('Error fetching records:', err);
-      setError('Failed to fetch records. Please try again later.');
-    } finally {
-      setIsLoading(false);
     }
+    setRecords(fetchedRecords);
   };
 
-  const handleVirtueSelection = (virtueId) => {
-    setSelectedVirtues(prev => 
-      prev.includes(virtueId) ? prev.filter(id => id !== virtueId) : [...prev, virtueId]
-    );
-  };
-
-  const handleWeekChange = (e) => {
-    const { name, value } = e.target;
-    const numValue = Number(value);
-    if (name === 'startWeek') {
-      setStartWeek(numValue > endWeek ? endWeek : numValue);
-    } else if (name === 'endWeek') {
-      setEndWeek(numValue < startWeek ? startWeek : numValue);
-    }
-  };
-
-  const calculateWeeklySuccess = useMemo(() => {
-    return (virtueId, weekNumber) => {
-      if (!records || records.length === 0) return 0;
-      
-      const weekRecord = records.find(record => record.virtueID === virtueId && record.weekNumber === weekNumber);
-      if (!weekRecord) return 0;
-      
-      const successCount = weekRecord.weekStatus.filter(status => status === 1).length;
+  const calculateVirtueProgress = (virtueId) => {
+    return records.map(record => {
+      const virtueStatuses = Object.values(record.days).map(day => day.virtues[virtueId].status);
+      const successCount = virtueStatuses.filter(status => status === 1).length;
       return (successCount / 7) * 100;
+    });
+  };
+
+  const chartData = useMemo(() => {
+    return {
+      labels: Array.from({ length: endWeek - startWeek + 1 }, (_, i) => `Semana ${startWeek + i}`),
+      datasets: allVirtues.map(virtue => ({
+        label: virtue.name,
+        data: calculateVirtueProgress(virtue.id),
+        backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`,
+      })),
     };
-  }, [records]);
-
-  const chartData = useMemo(() => ({
-    labels: Array.from({ length: endWeek - startWeek + 1 }, (_, i) => `Semana ${startWeek + i}`),
-    datasets: selectedVirtues.map((virtueId) => {
-      const virtue = allVirtues.find(v => v.id === virtueId);
-      const dataPoints = Array.from({ length: endWeek - startWeek + 1 }, (_, i) => {
-        return calculateWeeklySuccess(virtueId, startWeek + i);
-      });
-
-      return {
-        label: virtue ? virtue.name : 'Unknown Virtue',
-        data: dataPoints,
-        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
-      };
-    }),
-  }), [selectedVirtues, startWeek, endWeek, calculateWeeklySuccess]);
+  }, [records, startWeek, endWeek]);
 
   const chartOptions = {
     responsive: true,
     plugins: {
-      tooltip: {
-        callbacks: {
-          title: function (context) {
-            const weekLabel = context[0].label;
-            const weekNumber = Number(weekLabel.split(' ')[1]);
-            const virtueIndex = (weekNumber - 1) % allVirtues.length;
-            const virtue = allVirtues[virtueIndex];
-            return `Semana ${weekNumber} - Objetivo: ${virtue ? virtue.name : 'Sin objetivo'}`;
-          },
-        },
-      },
       legend: {
         position: 'top',
       },
       title: {
         display: true,
-        text: 'Progreso de Virtudes',
+        text: 'Progreso de Virtudes por Semana',
       },
     },
     scales: {
@@ -119,51 +67,42 @@ const ProgressChart = () => {
         max: 100,
         title: {
           display: true,
-          text: 'Porcentaje de Cumplimiento (%)',
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Semanas',
+          text: 'Porcentaje de Éxito',
         },
       },
     },
   };
 
-  if (isLoading) return <div>Cargando datos...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const handleWeekChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'startWeek') {
+      setStartWeek(parseInt(value));
+    } else {
+      setEndWeek(parseInt(value));
+    }
+  };
 
   return (
     <div className="progress-chart-container">
       <h2>Gráfico de Progreso</h2>
-      <div className="filters">
-        <div className="virtue-selector">
-          <label>Selecciona Virtudes:</label>
-          {allVirtues.map((virtue) => (
-            <div key={virtue.id}>
-              <input
-                type="checkbox"
-                checked={selectedVirtues.includes(virtue.id)}
-                onChange={() => handleVirtueSelection(virtue.id)}
-              />
-              {virtue.name}
-            </div>
-          ))}
-        </div>
-        <div className="week-selector">
-          <label>Semana Inicio:</label>
+      <div className="chart-controls">
+        <div>
+          <label htmlFor="startWeek">Semana Inicial:</label>
           <input
             type="number"
+            id="startWeek"
             name="startWeek"
             min="1"
             max="52"
             value={startWeek}
             onChange={handleWeekChange}
           />
-          <label>Semana Fin:</label>
+        </div>
+        <div>
+          <label htmlFor="endWeek">Semana Final:</label>
           <input
             type="number"
+            id="endWeek"
             name="endWeek"
             min="1"
             max="52"
