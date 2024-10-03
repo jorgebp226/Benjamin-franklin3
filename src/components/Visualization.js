@@ -37,9 +37,11 @@ const Visualization = () => {
   };
 
   const renderVirtueStatus = (virtue) => {
+    if (!weekRecords || weekRecords.length === 0) return null;
+    
     const record = weekRecords.find(r => r.virtueID === virtue.id);
     if (!record) return null;
-
+  
     return (
       <div key={virtue.id} className="virtue-row">
         <span className="virtue-name">{virtue.name}</span>
@@ -55,6 +57,7 @@ const Visualization = () => {
       </div>
     );
   };
+  
 
   return (
     <div className="visualization-container">

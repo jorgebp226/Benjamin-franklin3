@@ -65,8 +65,11 @@ const ProgressChart = () => {
 
   const calculateWeeklySuccess = useMemo(() => {
     return (virtueId, weekNumber) => {
+      if (!records || records.length === 0) return 0;
+      
       const weekRecord = records.find(record => record.virtueID === virtueId && record.weekNumber === weekNumber);
       if (!weekRecord) return 0;
+      
       const successCount = weekRecord.weekStatus.filter(status => status === 1).length;
       return (successCount / 7) * 100;
     };
