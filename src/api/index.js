@@ -12,6 +12,10 @@ export const getVirtueRecordsForWeek = async (userId, weekId) => {
       query: getVirtueRecordByUserAndWeek,
       variables: { userId, weekId },
     });
+    if (result.data.getVirtueRecordByUserAndWeek === null) {
+      console.log('No records found for this week');
+      return null;
+    }
     return result.data.getVirtueRecordByUserAndWeek;
   } catch (error) {
     console.error('Error fetching virtue records:', error);

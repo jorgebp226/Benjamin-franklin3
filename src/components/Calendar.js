@@ -34,11 +34,16 @@ const Calendar = ({ userId }) => {
     let weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
   
     if (!weekRecords) {
+      console.log('Creating initial records for the week');
       await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekVirtueID);
       weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
     }
   
-    setRecords(weekRecords);
+    if (weekRecords) {
+      setRecords(weekRecords);
+    } else {
+      console.error('Failed to load or create records for the week');
+    }
   };
   
   const toggleDescription = (virtueId) => {
@@ -49,6 +54,11 @@ const Calendar = ({ userId }) => {
   };
 
   const handleMark = async (virtueId, dayIndex) => {
+    if (!records || !records.days || !records.days[dayIndex] || !records.days[dayIndex].virtues || !records.days[dayIndex].virtues[virtueId]) {
+      console.error('Invalid record structure');
+      return;
+    }
+
     const currentStatus = records.days[dayIndex].virtues[virtueId].status;
     let newStatus = currentStatus === 0 ? 1 : currentStatus === 1 ? -1 : 0;
 
@@ -125,25 +135,31 @@ const Calendar = ({ userId }) => {
                 <td key={dayIndex}>
                   <div
                     className={`marker ${
-                      records[virtue.id]?.weekStatus[dayIndex] === 1
-                        ? 'success'
-                        : records[virtue.id]?.weekStatus[dayIndex] === -1
-                        ? 'error'
+                      records.days && records.days[dayIndex] && records.days[dayIndex].virtues[virtue.id]
+                        ? records.days[dayIndex].virtues[virtue.id].status === 1
+                          ? 'success'
+                          : records.days[dayIndex].virtues[virtue.id].status === -1
+                          ? 'error'
+                          : ''
                         : ''
                     }`}
                     onClick={() => handleMark(virtue.id, dayIndex)}
                     title={
-                      records[virtue.id]?.weekStatus[dayIndex] === 1
-                        ? 'Cumplido'
-                        : records[virtue.id]?.weekStatus[dayIndex] === -1
-                        ? 'No cumplido'
-                        : 'Marcar como cumplido'
+                      records.days && records.days[dayIndex] && records.days[dayIndex].virtues[virtue.id]
+                        ? records.days[dayIndex].virtues[virtue.id].status === 1
+                          ? 'Cumplido'
+                          : records.days[dayIndex].virtues[virtue.id].status === -1
+                          ? 'No cumplido'
+                          : 'Marcar como cumplido'
+                        : 'Cargando...'
                     }
                   >
-                    {records[virtue.id]?.weekStatus[dayIndex] === 1
-                      ? '🟢'
-                      : records[virtue.id]?.weekStatus[dayIndex] === -1
-                      ? '🔴'
+                    {records.days && records.days[dayIndex] && records.days[dayIndex].virtues[virtue.id]
+                      ? records.days[dayIndex].virtues[virtue.id].status === 1
+                        ? '🟢'
+                        : records.days[dayIndex].virtues[virtue.id].status === -1
+                        ? '🔴'
+                        : '⚪️'
                       : '⚪️'}
                   </div>
                 </td>
