@@ -58,7 +58,7 @@ const Calendar = ({ userId }) => {
     const currentStatus = record.weekStatus[dayIndex];
     let newStatus = currentStatus === 0 ? 1 : currentStatus === 1 ? -1 : 0;
 
-    const updatedRecord = await updateVirtueStatusCustom(record.id, dayIndex, newStatus);
+    const updatedRecord = await updateVirtueStatusCustom(record.id, dayIndex, virtueId, newStatus);
 
     if (updatedRecord) {
       setRecords(prev => ({

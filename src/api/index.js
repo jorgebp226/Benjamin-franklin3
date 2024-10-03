@@ -54,7 +54,7 @@ export const createInitialVirtueRecords = async (userId, weekId, weekNumber, wee
   }
 };
 
-export const updateVirtueStatus = async (id, dayIndex, virtueId, newStatus) => {
+export const updateVirtueStatusCustom = async (id, dayIndex, virtueId, newStatus) => {
   try {
     const result = await client.graphql({
       query: updateVirtueStatusCustom,
