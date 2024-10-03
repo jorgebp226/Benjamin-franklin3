@@ -6,6 +6,26 @@ import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 
 const client = generateClient();
 
+export const getVirtueRecordByUserAndWeek = async (userId, weekId) => {
+  try {
+    const result = await client.graphql({
+      query: getVirtueRecordByUserAndWeek,
+      variables: { userId, weekId },
+    });
+    if (result.data.getVirtueRecordByUserAndWeek === null) {
+      console.log('No se encontraron registros para esta semana');
+      return null;
+    }
+    return result.data.getVirtueRecordByUserAndWeek;
+  } catch (error) {
+    console.error('Error al obtener los registros de virtudes:', error);
+    if (error.errors && error.errors.length > 0) {
+      console.error('Error de GraphQL:', error.errors[0].message);
+    }
+    return null;
+  }
+};
+
 export const getVirtueRecordsForWeek = async (userId, weekId) => {
   try {
     const result = await client.graphql({
