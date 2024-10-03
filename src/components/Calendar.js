@@ -30,19 +30,25 @@ const Calendar = ({ userId }) => {
 
   const loadRecords = async () => {
     if (!currentWeek) return;
-  
-    let weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
-  
-    if (!weekRecords) {
-      console.log('Creating initial records for the week');
-      await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekVirtueID);
-      weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
-    }
-  
-    if (weekRecords) {
-      setRecords(weekRecords);
-    } else {
-      console.error('Failed to load or create records for the week');
+
+    try {
+      let weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
+
+      if (!weekRecords) {
+        console.log('Creating initial records for the week');
+        await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekVirtueID);
+        weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
+      }
+
+      if (weekRecords) {
+        setRecords(weekRecords);
+      } else {
+        console.error('Failed to load or create records for the week');
+        setRecords({}); // Set empty records to avoid errors in rendering
+      }
+    } catch (error) {
+      console.error('Error in loadRecords:', error);
+      setRecords({}); // Set empty records to avoid errors in rendering
     }
   };
   
@@ -55,7 +61,7 @@ const Calendar = ({ userId }) => {
 
   const handleMark = async (virtueId, dayIndex) => {
     if (!records || !records.days || !records.days[dayIndex] || !records.days[dayIndex].virtues || !records.days[dayIndex].virtues[virtueId]) {
-      console.error('Invalid record structure');
+      console.error('Invalid record structure', { records, virtueId, dayIndex });
       return;
     }
 

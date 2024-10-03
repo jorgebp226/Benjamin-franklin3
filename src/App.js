@@ -20,7 +20,7 @@ const App = () => {
           <h1>Seguimiento de Virtudes</h1>
           <p>Bienvenido, {user.username}</p>
           <button onClick={signOut}>Cerrar sesión</button>
-          <Calendar />
+          <Calendar userId={user.username} />
           <ProgressChart />
           <Visualization />
         </div>

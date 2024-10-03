@@ -19,6 +19,9 @@ export const getVirtueRecordsForWeek = async (userId, weekId) => {
     return result.data.getVirtueRecordByUserAndWeek;
   } catch (error) {
     console.error('Error fetching virtue records:', error);
+    if (error.errors && error.errors.length > 0) {
+      console.error('GraphQL error:', error.errors[0].message);
+    }
     return null;
   }
 };
