@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getVirtueRecordsForWeek } from '../api';
 import { virtues as allVirtues } from '../utils/virtues';
 import './Visualization.css';
+import { getWeekNumber } from '../utils/dateUtils';
 
 const Visualization = () => {
   const [weekRecords, setWeekRecords] = useState([]);

@@ -12,4 +12,3 @@ export const getWeekNumber = (date) => {
     const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Ajuste para lunes como primer día
     return new Date(d.setDate(diff));
   };
-  
