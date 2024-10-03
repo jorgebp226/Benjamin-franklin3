@@ -1,5 +1,5 @@
 import { generateClient } from 'aws-amplify/api';
-import { getVirtueRecordByUserAndWeek } from '../graphql/queries';
+import { getVirtueRecordByUserAndWeek as getVirtueRecordQuery } from '../graphql/queries';
 import { createVirtueRecord, updateVirtueStatus } from '../graphql/mutations';
 import { virtues } from '../utils/virtues';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
@@ -9,7 +9,7 @@ const client = generateClient();
 export const getVirtueRecordByUserAndWeek = async (userId, weekId) => {
   try {
     const result = await client.graphql({
-      query: getVirtueRecordByUserAndWeek,
+      query: getVirtueRecordQuery,
       variables: { userId, weekId },
     });
     if (result.data.getVirtueRecordByUserAndWeek === null) {
@@ -21,26 +21,6 @@ export const getVirtueRecordByUserAndWeek = async (userId, weekId) => {
     console.error('Error al obtener los registros de virtudes:', error);
     if (error.errors && error.errors.length > 0) {
       console.error('Error de GraphQL:', error.errors[0].message);
-    }
-    return null;
-  }
-};
-
-export const getVirtueRecordsForWeek = async (userId, weekId) => {
-  try {
-    const result = await client.graphql({
-      query: getVirtueRecordByUserAndWeek,
-      variables: { userId, weekId },
-    });
-    if (result.data.getVirtueRecordByUserAndWeek === null) {
-      console.log('No records found for this week');
-      return null;
-    }
-    return result.data.getVirtueRecordByUserAndWeek;
-  } catch (error) {
-    console.error('Error fetching virtue records:', error);
-    if (error.errors && error.errors.length > 0) {
-      console.error('GraphQL error:', error.errors[0].message);
     }
     return null;
   }

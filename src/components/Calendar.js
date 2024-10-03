@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { virtues as allVirtues } from '../utils/virtues';
-import { getVirtueRecordByUserAndWeek, createInitialVirtueRecords } from '../api';
+import { getVirtueRecordByUserAndWeek, createInitialVirtueRecords, updateVirtueStatusCall } from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './Calendar.css';
 
