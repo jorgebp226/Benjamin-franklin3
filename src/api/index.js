@@ -6,7 +6,7 @@ import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 
 const client = generateClient();
 
-export const getVirtueRecordByUserAndWeek = async (userId, weekId) => {
+export const getVirtueRecordsForWeek = async (userId, weekId) => {
   try {
     const result = await client.graphql({
       query: getVirtueRecordQuery,
