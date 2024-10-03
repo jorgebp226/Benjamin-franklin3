@@ -1,54 +1,73 @@
 import { generateClient } from 'aws-amplify/api';
-import { getVirtueRecordsByUserAndWeek } from '../graphql/queries';
-import { createVirtueRecord, updateVirtueRecordStatus } from '../graphql/mutations';
+import { getVirtueRecordByUserAndWeek } from '../graphql/queries';
+import { createVirtueRecord, updateVirtueStatusCustom } from '../graphql/mutations';
+import { virtues } from '../utils/virtues';
+import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 
 const client = generateClient();
 
 export const getVirtueRecordsForWeek = async (userId, weekId) => {
   try {
     const result = await client.graphql({
-      query: getVirtueRecordsByUserAndWeek,
+      query: getVirtueRecordByUserAndWeek,
       variables: { userId, weekId },
     });
-    return result.data.getVirtueRecordsByUserAndWeek || []; // Devuelve un array vacío si no hay registros
+    return result.data.getVirtueRecordByUserAndWeek;
   } catch (error) {
     console.error('Error fetching virtue records:', error);
-    return [];
+    return null;
   }
 };
 
 export const createInitialVirtueRecords = async (userId, weekId, weekNumber, weekVirtueID, year) => {
-  const virtues = ['temperance', 'silence', 'order', 'resolution', 'frugality', 'industry', 'sincerity', 'justice', 'moderation', 'cleanliness', 'tranquility', 'chastity', 'humility'];
-  
+  const startOfWeek = getStartOfWeek(new Date());
+  const days = {};
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startOfWeek);
+    date.setDate(date.getDate() + i);
+    days[i] = {
+      date: date.toISOString(),
+      virtues: virtues.reduce((acc, virtue) => {
+        acc[virtue.id] = { status: 0 };
+        return acc;
+      }, {}),
+    };
+  }
+
   try {
-    for (let virtueID of virtues) {
-      await client.graphql({
-        query: createVirtueRecord,
-        variables: {
-          input: {
-            userId,
-            weekId,
-            virtueID,
-            weekStatus: [0, 0, 0, 0, 0, 0, 0],
-            weekNumber,
-            weekVirtueID,
-            year,
-          },
+    const result = await client.graphql({
+      query: createVirtueRecord,
+      variables: {
+        input: {
+          userId,
+          weekId,
+          weekVirtueId: weekVirtueID,
+          days: JSON.stringify(days),
         },
-      });
-    }
+      },
+    });
+    return result.data.createVirtueRecord;
   } catch (error) {
     console.error('Error creating initial virtue records:', error);
+    return null;
   }
 };
 
-export const updateVirtueStatus = async (id, dayIndex, newStatus) => {
+export const updateVirtueStatus = async (id, dayIndex, virtueId, newStatus) => {
   try {
     const result = await client.graphql({
-      query: updateVirtueRecordStatus,
-      variables: { id, dayIndex, newStatus },
+      query: updateVirtueStatusCustom,
+      variables: {
+        input: {
+          id,
+          dayIndex,
+          virtueId,
+          newStatus,
+        },
+      },
     });
-    return result.data.updateVirtueRecordStatus;
+    return result.data.updateVirtueStatusCustom;
   } catch (error) {
     console.error('Error updating virtue status:', error);
     return null;

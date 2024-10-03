@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { virtues as allVirtues } from '../utils/virtues';
-import { getVirtueRecordsForWeek, createInitialVirtueRecords, updateVirtueStatus } from '../api';
+import { getVirtueRecordsForWeek, createInitialVirtueRecords, updateVirtueStatusCustom } from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './Calendar.css';
 
@@ -58,7 +58,7 @@ const Calendar = ({ userId }) => {
     const currentStatus = record.weekStatus[dayIndex];
     let newStatus = currentStatus === 0 ? 1 : currentStatus === 1 ? -1 : 0;
 
-    const updatedRecord = await updateVirtueStatus(record.id, dayIndex, newStatus);
+    const updatedRecord = await updateVirtueStatusCustom(record.id, dayIndex, newStatus);
 
     if (updatedRecord) {
       setRecords(prev => ({
@@ -92,6 +92,7 @@ const Calendar = ({ userId }) => {
     const day = date.getDay();
     return day === 0 ? 'Domingo' : daysOfWeek[day - 1];
   };
+
 
   if (!currentWeek) return <div>Cargando...</div>;
 
@@ -167,5 +168,6 @@ const Calendar = ({ userId }) => {
     </div>
   );
 };
+
 
 export default Calendar;

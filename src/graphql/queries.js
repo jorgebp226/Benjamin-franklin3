@@ -1,17 +1,14 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getVirtueRecordsByUserAndWeek = /* GraphQL */ `
-  query GetVirtueRecordsByUserAndWeek($userId: ID!, $weekId: String!) {
-    getVirtueRecordsByUserAndWeek(userId: $userId, weekId: $weekId) {
+export const getVirtueRecordByUserAndWeek = /* GraphQL */ `
+  query GetVirtueRecordByUserAndWeek($userId: ID!, $weekId: String!) {
+    getVirtueRecordByUserAndWeek(userId: $userId, weekId: $weekId) {
       id
       userId
       weekId
-      virtueID
-      weekStatus
-      weekNumber
-      weekVirtueID
-      year
+      weekVirtueId
+      days
       createdAt
       updatedAt
       owner
@@ -25,11 +22,8 @@ export const getVirtueRecord = /* GraphQL */ `
       id
       userId
       weekId
-      virtueID
-      weekStatus
-      weekNumber
-      weekVirtueID
-      year
+      weekVirtueId
+      days
       createdAt
       updatedAt
       owner
@@ -48,11 +42,8 @@ export const listVirtueRecords = /* GraphQL */ `
         id
         userId
         weekId
-        virtueID
-        weekStatus
-        weekNumber
-        weekVirtueID
-        year
+        weekVirtueId
+        days
         createdAt
         updatedAt
         owner
@@ -63,49 +54,17 @@ export const listVirtueRecords = /* GraphQL */ `
     }
   }
 `;
-export const virtueRecordsByUser = /* GraphQL */ `
-  query VirtueRecordsByUser(
+export const virtueRecordsByUserIdAndWeekId = /* GraphQL */ `
+  query VirtueRecordsByUserIdAndWeekId(
     $userId: ID!
+    $weekId: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelVirtueRecordFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    virtueRecordsByUser(
+    virtueRecordsByUserIdAndWeekId(
       userId: $userId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        userId
-        weekId
-        virtueID
-        weekStatus
-        weekNumber
-        weekVirtueID
-        year
-        createdAt
-        updatedAt
-        owner
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const virtueRecordsByWeek = /* GraphQL */ `
-  query VirtueRecordsByWeek(
-    $weekId: String!
-    $sortDirection: ModelSortDirection
-    $filter: ModelVirtueRecordFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    virtueRecordsByWeek(
       weekId: $weekId
       sortDirection: $sortDirection
       filter: $filter
@@ -116,11 +75,8 @@ export const virtueRecordsByWeek = /* GraphQL */ `
         id
         userId
         weekId
-        virtueID
-        weekStatus
-        weekNumber
-        weekVirtueID
-        year
+        weekVirtueId
+        days
         createdAt
         updatedAt
         owner
