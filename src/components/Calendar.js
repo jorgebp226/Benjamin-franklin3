@@ -30,22 +30,22 @@ const Calendar = ({ userId }) => {
 
   const loadRecords = async () => {
     if (!currentWeek) return;
-
+  
     let weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
-
+  
     if (weekRecords.length === 0) {
       await createInitialVirtueRecords(userId, currentWeek.weekId, currentWeek.weekNumber, currentWeek.weekVirtueID, currentWeek.year);
-      weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);
+      weekRecords = await getVirtueRecordsForWeek(userId, currentWeek.weekId);  // Recarga los registros
     }
-
+  
     const formattedRecords = {};
     weekRecords.forEach(record => {
       formattedRecords[record.virtueID] = record;
     });
-
+  
     setRecords(formattedRecords);
   };
-
+  
   const toggleDescription = (virtueId) => {
     setShowDescription((prevState) => ({
       ...prevState,

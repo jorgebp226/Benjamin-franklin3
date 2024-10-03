@@ -37,10 +37,10 @@ const Visualization = () => {
   };
 
   const renderVirtueStatus = (virtue) => {
-    if (!weekRecords || weekRecords.length === 0) return null;
-    
+    if (!weekRecords || weekRecords.length === 0) return <div>No records found for this week.</div>;
+  
     const record = weekRecords.find(r => r.virtueID === virtue.id);
-    if (!record) return null;
+    if (!record) return <div>No record found for virtue {virtue.name}</div>;
   
     return (
       <div key={virtue.id} className="virtue-row">
@@ -57,7 +57,6 @@ const Visualization = () => {
       </div>
     );
   };
-  
 
   return (
     <div className="visualization-container">
