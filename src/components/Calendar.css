@@ -1,48 +1,87 @@
 /* src/components/Calendar.css */
 .calendar-container {
-    margin-bottom: 40px;
-  }
-  
-  .calendar-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  
-  .calendar-table th, .calendar-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-  }
-  
-  .calendar-table th {
-    background-color: #f2f2f2;
-  }
-  
-  .marker {
-    cursor: pointer;
-    font-size: 1.5em;
-  }
-  
-  .success {
-    color: green;
-  }
-  
-  .error {
-    color: red;
-  }
-  
-  .weekly-improvements ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .weekly-improvements li {
-    margin-bottom: 5px;
-  }
-  
-  .current-day {
-    margin-top: 20px;
-    font-size: 1.2em;
-  }
-  
+  margin-bottom: 40px;
+}
+
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.calendar-table th, .calendar-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.calendar-table th {
+  background-color: #f2f2f2;
+}
+
+.marker {
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.success {
+  color: green;
+}
+
+.error {
+  color: red;
+}
+
+.weekly-improvements ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.weekly-improvements li {
+  margin-bottom: 5px;
+}
+
+.current-day {
+  margin-top: 20px;
+  font-size: 1.2em;
+}
+
+/* Nuevos estilos para mejorar la apariencia */
+.calendar-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.calendar-table button {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.calendar-table button:hover {
+  background-color: #e0e0e0;
+}
+
+.calendar-table p {
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.weekly-improvements h3 {
+  color: #444;
+  margin-top: 30px;
+}
+
+.weekly-improvements li {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.weekly-improvements li:last-child {
+  border-bottom: none;
+}

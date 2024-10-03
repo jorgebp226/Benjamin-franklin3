@@ -1,6 +1,32 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const updateVirtueRecordStatus = /* GraphQL */ `
+  mutation UpdateVirtueRecordStatus(
+    $id: ID!
+    $dayIndex: Int!
+    $newStatus: Int!
+  ) {
+    updateVirtueRecordStatus(
+      id: $id
+      dayIndex: $dayIndex
+      newStatus: $newStatus
+    ) {
+      id
+      userId
+      weekId
+      virtueID
+      weekStatus
+      weekNumber
+      weekVirtueID
+      year
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
 export const createVirtueRecord = /* GraphQL */ `
   mutation CreateVirtueRecord(
     $input: CreateVirtueRecordInput!
@@ -9,12 +35,12 @@ export const createVirtueRecord = /* GraphQL */ `
     createVirtueRecord(input: $input, condition: $condition) {
       id
       userId
-      dateVirtueID
+      weekId
       virtueID
-      status
-      date
+      weekStatus
       weekNumber
       weekVirtueID
+      year
       createdAt
       updatedAt
       owner
@@ -30,12 +56,12 @@ export const updateVirtueRecord = /* GraphQL */ `
     updateVirtueRecord(input: $input, condition: $condition) {
       id
       userId
-      dateVirtueID
+      weekId
       virtueID
-      status
-      date
+      weekStatus
       weekNumber
       weekVirtueID
+      year
       createdAt
       updatedAt
       owner
@@ -51,12 +77,12 @@ export const deleteVirtueRecord = /* GraphQL */ `
     deleteVirtueRecord(input: $input, condition: $condition) {
       id
       userId
-      dateVirtueID
+      weekId
       virtueID
-      status
-      date
+      weekStatus
       weekNumber
       weekVirtueID
+      year
       createdAt
       updatedAt
       owner
