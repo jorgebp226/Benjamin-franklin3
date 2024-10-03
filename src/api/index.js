@@ -1,5 +1,5 @@
 import { generateClient } from 'aws-amplify/api';
-import { getVirtueRecordByUserAndWeek } from './queries';
+import { getVirtueRecordByUserAndWeek } from '../graphql/queries';
 import { createVirtueRecord } from './mutations';
 import { updateVirtueStatus } from '../graphql/mutations';
 import { virtues } from '../utils/virtues';
