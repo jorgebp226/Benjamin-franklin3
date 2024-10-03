@@ -1,6 +1,7 @@
+// index.js
 import { generateClient } from 'aws-amplify/api';
 import { getVirtueRecordByUserAndWeek } from '../graphql/queries';
-import { createVirtueRecord, updateVirtueStatusCustom } from '../graphql/mutations';
+import { createVirtueRecord, updateVirtueStatusCustom as updateVirtueStatusGraphQL } from '../graphql/mutations'; // Cambié el nombre aquí
 import { virtues } from '../utils/virtues';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 
@@ -54,10 +55,11 @@ export const createInitialVirtueRecords = async (userId, weekId, weekNumber, wee
   }
 };
 
-export const updateVirtueStatusCustom = async (id, dayIndex, virtueId, newStatus) => {
+// Renombrar la función localmente para evitar conflicto
+export const updateVirtueStatusCustomLocal = async (id, dayIndex, virtueId, newStatus) => {
   try {
     const result = await client.graphql({
-      query: updateVirtueStatusCustom,
+      query: updateVirtueStatusGraphQL,  // Usar la importación con el nombre cambiado
       variables: {
         input: {
           id,
