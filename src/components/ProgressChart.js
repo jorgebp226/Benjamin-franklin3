@@ -1,9 +1,8 @@
-// src/components/ProgressChart.js
 import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { virtues as allVirtues } from '../utils/virtues';
-import { getVirtuesWithRecords } from '../api';
+import { getVirtueRecordsForWeek } from '../api';
 import { getWeekNumber, getStartOfWeek } from '../utils/dateUtils';
 import './ProgressChart.css';
 
@@ -21,26 +20,16 @@ const ProgressChart = () => {
 
   const fetchRecords = async () => {
     const currentYear = new Date().getFullYear();
-    const startDate = getDateFromWeekNumber(startWeek, currentYear);
-    const endDate = getDateFromWeekNumber(endWeek, currentYear, true);
-    const startDateString = startDate.toISOString().split('T')[0];
-    const endDateString = endDate.toISOString().split('T')[0];
-    const data = await getVirtuesWithRecords(startDateString, endDateString);
-    setRecords(data);
-  };
+    const userId = 'currentUserId'; // Asume que tienes acceso al ID del usuario actual
+    let allRecords = [];
 
-  const getDateFromWeekNumber = (weekNumber, year, isEndOfWeek = false) => {
-    const simple = new Date(year, 0, 1 + (weekNumber - 1) * 7);
-    const dow = simple.getDay();
-    const ISOweekStart = new Date(simple);
-    if (dow <= 4)
-      ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-    else
-      ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-    if (isEndOfWeek) {
-      ISOweekStart.setDate(ISOweekStart.getDate() + 6);
+    for (let week = startWeek; week <= endWeek; week++) {
+      const weekId = `${currentYear}-W${week.toString().padStart(2, '0')}`;
+      const weekRecords = await getVirtueRecordsForWeek(userId, weekId);
+      allRecords = [...allRecords, ...weekRecords];
     }
-    return ISOweekStart;
+
+    setRecords(allRecords);
   };
 
   const handleVirtueSelection = (virtueId) => {
@@ -61,11 +50,11 @@ const ProgressChart = () => {
 
   const calculateWeeklySuccess = (virtueId, weekNumber) => {
     const weekRecords = records.filter(record => record.virtueID === virtueId && record.weekNumber === weekNumber);
-    const successCount = weekRecords.filter(record => record.status === 1).length;
+    if (weekRecords.length === 0) return 0;
+    const successCount = weekRecords[0].weekStatus.filter(status => status === 1).length;
     return (successCount / 7) * 100;
   };
 
-  // Preparar datos para el gráfico
   const chartData = {
     labels: Array.from({ length: endWeek - startWeek + 1 }, (_, i) => `Semana ${startWeek + i}`),
     datasets: selectedVirtues.map((virtueId) => {
